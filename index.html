@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>成績輸入</title>
+    <!-- 引入 Firebase SDK -->
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+        import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-analytics.js";
+
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDgJBbg13TmCB-Lak_tAKvTdC0duV53dH4",
+            authDomain: "test1-22e08.firebaseapp.com",
+            databaseURL: "https://test1-22e08-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "test1-22e08",
+            storageBucket: "test1-22e08.firebasestorage.app",
+            messagingSenderId: "580024216609",
+            appId: "1:580024216609:web:066fd996ea68919dfe8760",
+            measurementId: "G-8TPBZTG3T4"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const database = getDatabase(app);  // 獲取資料庫引用
+
+        // 表單提交事件處理
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('scoreForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                // 獲取輸入欄位的值
+                const studentName = document.getElementById('studentName').value;
+                const score = Number(document.getElementById('score').value); // 確保成績是數字
+
+                // 檢查輸入是否有效
+                if (studentName && score) {
+                    // 把數據寫入 Firebase Realtime Database
+                    const scoreRef = ref(database, 'scores/' + studentName);  // 使用學生姓名作為鍵
+                    set(scoreRef, {
+                        score: score
+                    })
+                    .then(() => {
+                        alert("成績已成功提交！");
+                        document.getElementById('scoreForm').reset();  // 重設表單
+                    })
+                    .catch((error) => {
+                        console.error("提交失敗: ", error);  // 打印錯誤信息
+                        alert("提交失敗: " + error.message);
+                    });
+                } else {
+                    alert("請填寫完整的資料！");
+                }
+            });
+        });
+    </script>
+</head>
+<body>
+    <h1>成績輸入</h1>
+
+    <!-- 表單區域 -->
+    <form id="scoreForm">
+        <label for="studentName">學生姓名:</label>
+        <input type="text" id="studentName" placeholder="輸入學生姓名" required><br><br>
+
+        <label for="score">成績:</label>
+        <input type="number" id="score" placeholder="輸入成績" required><br><br>
+
+        <button type="submit">送出</button>
+    </form>
+</body>
+</html>
